@@ -1,18 +1,29 @@
-const http = require("http");
+const express = require("express");
+const authMiddle = require("./middleware/authMiddleware");
+const bankAmount = require("./controller/bankAmountController");
+const app = express();
+const mongoose = require("mongoose");
+const userDelete = require("./controller/userDelete");
+const userUpdate = require("./controller/userUpdate");
+const registration = require("./controller/regiController");
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/" && req.method === "GET") {
-    res.end("Home");
-  }else if(req.url === "/about" && req.method === "GET"){
-    res.end("About")
-  }else{
-    res.writeHead(404);
-    res.end("404 not found!")
-  }
+mongoose
+  .connect(
+    "mongodb+srv://jhulonkumar244:208jK244@cluster0.zsglfxk.mongodb.net/todo?appName=Cluster0",
+  )
+  .then(() => console.log("Connected"))
+  .catch((err) => console.log(err));
+
+const port = 5000;
+
+app.use(express.json());
+
+app.get("/bank", authMiddle, bankAmount);
+
+app.post("/registration", registration);
+app.delete("/user/:id", userDelete);
+app.post("/update/:id", userUpdate);
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
-
-
-server.listen(5000, ()=>{
-    console.log("server is running...");
-    
-})
